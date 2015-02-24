@@ -11,11 +11,7 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
- exports.data = {results: [{
-    username: 'user',
-    roomname: 'room',
-    text: 'text'
-  }]};
+ exports.data = {results: []};
 
  exports.requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -32,18 +28,35 @@ this file and include it in basic-server.js so that it actually works.
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
-  if (request.method === "GET" && request.url === "/classes/chatterbox"){
-    //call getMessages with request and response
-    console.log('Get Request Received');
-    var statusCode = 200;
+  console.log("Serving request type " + request.method + " for url " + request.url);
+
+  var createResponse = function(status, type, payload){
     var headers = exports.defaultCorsHeaders;
-    headers['Content-Type'] = "text/json";
-    response.writeHead(statusCode, headers);
-    response.end(JSON.stringify(exports.data));
+    headers['Content-Type'] = "text/" + type;
+    response.writeHead(status, headers);
+    response.end(payload);
+  };
+  if (request.method === "OPTIONS") {
+    createResponse(200, "plain", "GET, POST, PUT, DELETE, OPTIONS");
   }
 
-  if (request.method === "POST" && request.url === "/classes/chatterbox"){
+  if (request.method === "GET" && request.url === "/classes/messages"){
     //call getMessages with request and response
+    console.log('Get Request Received');
+    createResponse(200, "json", JSON.stringify(exports.data));
+
+  }
+
+  else if (request.method === "GET" && request.url.slice(0,13) === "/classes/room"){
+    //call getMessages with request and response
+    console.log('Get Request Received');
+    createResponse(200, "json", JSON.stringify(exports.data));
+
+  }
+
+  else if (request.method === "POST" && request.url === "/classes/messages"){
+    //call getMessages with request and response
+
     console.log('Post Request Received');
     var body = "";
     request.on('data', function (chunk) {
@@ -53,12 +66,42 @@ this file and include it in basic-server.js so that it actually works.
 
     request.on('end', function () {
       exports.data.results.push(JSON.parse(body));
-      var statusCode = 200;
+      createResponse(201, "json", JSON.stringify(exports.data));
+    });
+  }
+
+  else if (request.method === "POST" && request.url.slice(0,13) === "/classes/room"){
+    //call getMessages with request and response
+
+    console.log('Post Request Received');
+    var body = "";
+    request.on('data', function (chunk) {
+        console.log('got %d bytes of data :', chunk.length);
+        body += chunk;
+    });
+
+    request.on('end', function () {
+      exports.data.results.push(JSON.parse(body));
+      createResponse(201, "json", JSON.stringify(exports.data));
     });
   }
 
 
-  console.log("Serving request type " + request.method + " for url " + request.url);
+
+  else {
+    createResponse(404, "plain", "sorry, bro.");
+  }
+
+  // if (request.method === "GET" && request.url === "/log"){
+  //   var statusCode = 200;
+  //   var headers = exports.defaultCorsHeaders;
+  //   headers['Content-Type'] = "text/plain";
+  //   response.writeHead(statusCode, headers);
+  //   response.end("log");
+  // }
+
+/*
+
   // The outgoing status.
   var statusCode = 200;
 
@@ -83,6 +126,7 @@ this file and include it in basic-server.js so that it actually works.
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
   response.end("Hello, World!");
+*/
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).

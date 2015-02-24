@@ -1,13 +1,13 @@
 // backbone implementation
 var Message = Backbone.Model.extend({
-  url : "http://127.0.0.1:3000/classes/chatterbox",//"https://api.parse.com/1/classes/chatterbox",
+  url : "http://127.0.0.1:3000/classes/messages",//"https://api.parse.com/1/classes/messages",
   defaults : {username: '',
              text: ''}
 });
 
 var Messages = Backbone.Collection.extend({
   model : Message,
-  url : "http://127.0.0.1:3000/classes/chatterbox",//"https://api.parse.com/1/classes/chatterbox",
+  url : "http://127.0.0.1:3000/classes/messages",//"https://api.parse.com/1/classes/messages",
   filter : {
     order:"-updatedAt"
   },
