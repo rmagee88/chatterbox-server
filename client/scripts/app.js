@@ -1,8 +1,21 @@
+ String.prototype.hashCode = function(){
+  var hash = 0;
+  if (this.length == 0) return hash;
+  for (i = 0; i < this.length; i++) {
+    char = this.charCodeAt(i);
+    hash = ((hash<<5)-hash)+char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash;
+ }
+
+
 // backbone implementation
 var Message = Backbone.Model.extend({
   url : "http://127.0.0.1:3000/classes/messages",//"https://api.parse.com/1/classes/messages",
   defaults : {username: '',
-             text: ''}
+             text: '',
+             objectId: ''}
 });
 
 var Messages = Backbone.Collection.extend({
@@ -45,10 +58,14 @@ var FormView = Backbone.View.extend({
 
     this.startSpinner();
 
-    this.collection.create({
+    var preHash = {
       username: $user.val(),
       text: $text.val()
-    });
+    };
+
+    preHash.objectId = JSON.stringify(preHash).hashCode();
+
+    this.collection.create(preHash);
 
     $text.val('');
   },
@@ -86,9 +103,8 @@ var FormView = Backbone.View.extend({
 
 var MessageView = Backbone.View.extend({
 
-// <div class="chat" data-id="<%= objectId %>"> \
-
-  template: _.template('<div class="user" data-user="<%- username %>"><%- username %></div> \
+  template: _.template('<div class="chat" data-id="<%= objectId %>"> \
+                      <div class="user" data-user="<%- username %>"><%- username %></div> \
                       <div class="text"><%- text %></div> \
                       </div>'),
 
@@ -138,11 +154,11 @@ var MessagesView = Backbone.View.extend({
   },
 
   renderMessage: function(message) {
-    // if (!this.collection.displayedMessages[message.get('objectId')]) {
+    if (!this.collection.displayedMessages[message.get('objectId')]) {
       var messageView = new MessageView({model: message});
       this.$el.prepend(messageView.render());
-      // this.collection.displayedMessages[message.get('objectId')] = true;
-    // }
+      this.collection.displayedMessages[message.get('objectId')] = true;
+    }
   }
 });
 
