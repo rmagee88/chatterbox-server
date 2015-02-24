@@ -11,18 +11,17 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+  var fs = require("fs");
 
- // Hashing function
- String.prototype.hashCode = function(){
-  var hash = 0;
-  if (this.length == 0) return hash;
-  for (i = 0; i < this.length; i++) {
-    char = this.charCodeAt(i);
-    hash = ((hash<<5)-hash)+char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return hash;
- }
+  exports.writeData = function(filename){
+    fs.writeFile(filename, JSON.stringify(exports.data));
+  };
+
+  exports.readData = function(filename){
+    fs.readFile(filename, function(err, data){
+      exports.data = JSON.parse(data);
+    });
+  };
 
 
  exports.data = {results: []};
@@ -81,7 +80,9 @@ this file and include it in basic-server.js so that it actually works.
     request.on('end', function () {
       exports.data.results.push(JSON.parse(body));
       createResponse(201, "json", JSON.stringify(exports.data));
+      exports.writeData('./log.txt');
     });
+
   }
 
   else if (request.method === "POST" && request.url.slice(0,13) === "/classes/room"){
