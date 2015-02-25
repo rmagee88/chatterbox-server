@@ -10,76 +10,6 @@ app.options(/messages/, function (req, res) {
   handler.createResponse(200, "text/plain", "GET, POST, PUT, DELETE, OPTIONS", req, res);
 });
 
-app.get('/', function (req, res) {
-  // read in index.html and send it
-  console.log('Index Request Received');
-  var payloadData;
-  fs.readFile('../client/index.html', {encoding: 'utf-8'}, function(err, data){
-    if (err) {
-      console.log(err);
-    }
-    payloadData = data;
-    handler.createResponse(200, "text/html", payloadData, req, res);
-  });
-});
-
-app.get(/images/, function (req, res) {
-  // read in index.html and send it
-  urlParts = url.parse(req.url);
-  console.log('CSS Request Received');
-  var payloadData;
-  fs.readFile('../client/' + urlParts.pathname, {encoding: 'utf-8'}, function(err, data){
-    if (err) {
-      console.log(err);
-    }
-    payloadData = data;
-    handler.createResponse(200, "image", payloadData, req, res);
-  });
-});
-
-app.get(/styles/, function (req, res) {
-  // read in index.html and send it
-  urlParts = url.parse(req.url);
-  console.log('CSS Request Received');
-  var payloadData;
-  fs.readFile('../client/' + urlParts.pathname, {encoding: 'utf-8'}, function(err, data){
-    if (err) {
-      console.log(err);
-    }
-    payloadData = data;
-    handler.createResponse(200, "text/css", payloadData, req, res);
-  });
-});
-
-app.get(/scripts/, function (req, res) {
-  // read in index.html and send it
-  urlParts = url.parse(req.url);
-  console.log('Scripts Request Received');
-  var payloadData;
-  fs.readFile('../client/' + urlParts.pathname, {encoding: 'utf-8'}, function(err, data){
-    if (err) {
-      console.log(err);
-    }
-    payloadData = data;
-    handler.createResponse(200, "text/javascript", payloadData, req, res);
-  });
-});
-
-app.get(/bower_components/, function (req, res) {
-  // read in index.html and send it
-  urlParts = url.parse(req.url);
-  console.log('Bower Components Request Received');
-  var payloadData;
-  fs.readFile('../client/' + urlParts.pathname, {encoding: 'utf-8'}, function(err, data){
-    if (err) {
-      console.log(err);
-    }
-    payloadData = data;
-    handler.createResponse(200, "text/javascript", payloadData, req, res);
-  });
-});
-
-
 app.get(/classes/, function (req, res) {
   console.log('Get Request Received');
   handler.createResponse(200, "text/json", JSON.stringify(handler.data), req, res);
@@ -90,6 +20,24 @@ app.post(/classes/, function (req, res) {
   handler.postHandler(req, res);
 });
 
+app.get(/(w+)?/, function (req, res) {
+  console.log('Index Request Received');
+  urlParts = url.parse(req.url);
+  var payloadData;
+  if (urlParts.pathname === '/') {
+    locationStr = '../client/index.html';
+  } else {
+    locationStr = '../client/' + urlParts.pathname;
+  }
+  fs.readFile(locationStr, {encoding: 'utf-8'}, function(err, data){
+    if (err) {
+      console.log(err);
+    }
+    payloadData = data;
+    handler.createResponse(200, "", payloadData, req, res);
+  });
+});
+
 var server = app.listen(3000, function () {
 
   var host = server.address().address
@@ -98,7 +46,4 @@ var server = app.listen(3000, function () {
 
   console.log('Example app listening at http://%s:%s', host, port)
 
-})
-
-
-
+});

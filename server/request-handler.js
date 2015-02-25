@@ -53,5 +53,5 @@ exports.postHandler = function(req, res){
     exports.createResponse(201, "text/json", JSON.stringify(exports.data), req, res);
     exports.writeData('./log.txt');
   });
-}
+};
 
