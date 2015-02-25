@@ -34,7 +34,7 @@ exports.readData = function(filename){
 
 exports.createResponse = function(status, type, payload, req, res){
   var headers = exports.defaultCorsHeaders;
-  headers['Content-Type'] = "text/" + type;
+  headers['Content-Type'] = type;
   res.writeHead(status, headers);
   res.end(payload);
 };
@@ -50,7 +50,7 @@ exports.postHandler = function(req, res){
   req.on('end', function () {
     debugger;
     exports.data.results.push(JSON.parse(body));
-    exports.createResponse(201, "json", JSON.stringify(exports.data), req, res);
+    exports.createResponse(201, "text/json", JSON.stringify(exports.data), req, res);
     exports.writeData('./log.txt');
   });
 }

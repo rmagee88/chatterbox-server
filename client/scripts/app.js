@@ -32,11 +32,7 @@ var Messages = Backbone.Collection.extend({
   },
 
   parse: function(response, options) {
-    results = [];
-    for (var i = response.results.length-1; i >= 0; i--) {
-      results.push(response.results[i]);
-    }
-    return results;
+    return response.results;
   }
 
 });
